@@ -8,8 +8,19 @@ class Category:
         self.amount = 0
         self.children = children
 
-    def add_transaction(self, amount):
-        self.amount += amount
+    def find_child_by_name(self, name):
+        for cat in self:
+            if cat.name == name:
+                return cat
+
+    def add_transaction(self, amount, category_name=None):
+        category_name = category_name or self.name
+        cat = self.find_child_by_name(category_name)
+
+        if cat is None:
+            raise Exception(f"Category {category_name} not found!")
+
+        cat.amount += amount
 
     def calculate_total(self):
         "Return amount of all children (recursively) + own amount"
@@ -32,7 +43,8 @@ expenses = Category(
         Category(
             "Food & Beverages",
             [
-                Category("Bar, Cafe"),
+                Category("Food & Drinks"),  # seems to be some old name
+                Category("Bar, Cafe", [Category("Bar, cafe")]),
                 Category("Groceries", [Category("Meal Kits")]),
                 Category(
                     "Restaurant, fast-food",
@@ -43,10 +55,15 @@ expenses = Category(
         Category(
             "Shopping",
             [
-                Category("Clothes & Footwear"),
+                Category(
+                    "Clothes & Footwear",
+                    [
+                        Category("Clothes & shoes"),  # seems to be some old name
+                    ],
+                ),
                 Category("Drug-store, chemist"),
                 Category("Electronics, accessories"),
-                Category("Gifts, joy"),
+                Category("Gifts, joy", [Category("Gifts")]),
                 Category("Health and beauty"),
                 Category("Home, garden"),
                 Category("Jewels, accessories"),
@@ -102,7 +119,7 @@ expenses = Category(
                     "Health care, doctor",
                     [Category("Medical treatment, therapy"), Category("Medicine")],
                 ),
-                Category("Hobbies"),
+                Category("Hobbies", [Category("Free time")]),
                 Category("Holiday, trips, hotels"),
                 Category("Life events"),
                 Category("Lottery, gambling"),
@@ -116,7 +133,7 @@ expenses = Category(
                 Category("Internet"),
                 Category("Postal services"),
                 Category("Software, apps, games", [Category("Gaming")]),
-                Category("Telephony, mobile phone"),
+                Category("Telephony, mobile phone", [Category("Phone, cell phone")]),
             ],
         ),
         Category(
@@ -127,7 +144,7 @@ expenses = Category(
                 Category("Child Support"),
                 Category("Fines"),
                 Category("Insurances"),
-                Category("Loans, interests"),
+                Category("Loans, interests", [Category("Loan, interests")]),
                 Category("Taxes", [Category("DDI (Ausschüttungsgleicher Ertrag)")]),
             ],
         ),
@@ -150,6 +167,7 @@ expenses = Category(
                         Category("Lent out money"),
                         Category("Returned lent out money"),
                         Category("Temporarily held money intended for another purpose"),
+                        Category("Unknown Expense", [Category("UNKNOWN_CATEGORY")]),
                     ],
                 ),
             ],
