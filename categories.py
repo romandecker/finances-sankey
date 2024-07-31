@@ -8,14 +8,14 @@ class Category:
         self.amount = 0
         self.children = children
 
-    def find_child_by_name(self, name):
+    def find_by_name(self, name):
         for cat in self:
             if cat.name == name:
                 return cat
 
     def add_transaction(self, amount, category_name=None):
         category_name = category_name or self.name
-        cat = self.find_child_by_name(category_name)
+        cat = self.find_by_name(category_name)
 
         if cat is None:
             raise Exception(f"Category {category_name} not found!")
@@ -24,7 +24,7 @@ class Category:
 
     def calculate_total(self):
         "Return amount of all children (recursively) + own amount"
-        return reduce(lambda acc, cat: acc + cat.amount, self, self.amount)
+        return reduce(lambda acc, cat: acc + cat.amount, self, 0)
 
     def __str__(self):
         return f"{self.name} ({self.amount})"

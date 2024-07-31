@@ -14,7 +14,8 @@ if __name__ == "__main__":
         reader = csv.DictReader(csvfile, delimiter=";", quotechar='"')
         num_transfers = 0
         num_currency_errors = 0
-        for row in reader:
+        for i, row in enumerate(reader):
+
             if row["type"] == "Expenses":
                 currency = row["currency"]
                 if currency != args.currency:
@@ -26,7 +27,8 @@ if __name__ == "__main__":
                     continue
 
                 try:
-                    expenses.add_transaction(abs(float(row["amount"])), row["category"])
+                    amount = abs(float(row["amount"]))
+                    expenses.add_transaction(amount, row["category"])
                 except Exception as err:
                     print(f"Warning: {err}")
 
@@ -43,9 +45,9 @@ if __name__ == "__main__":
     value = []
     target = []
 
-    # TODO: Something's definitely wrong with calculate_total()...
+    # TODO: Need a way to filter out certain things: When buying a stock for 100, then selling for 100 and buying for 100 again, it will show up as 200 in expenses...
     for i, name in enumerate(labels):
-        cat = expenses.find_child_by_name(name)
+        cat = expenses.find_by_name(name)
         for direct_child in cat.children:
             child_index = labels.index(direct_child.name)
             source.append(i)

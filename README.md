@@ -8,3 +8,9 @@ Generate a sankey diagram from a budgetbakers wallet export
 4. `pre-commit install`
 5. Launch IDE with correct environment: `code .`
 6. Run main entrypoint: `python3 main.py wallet-export.csv`
+
+# Running tests
+
+```
+python3 -m unittest discover -s tests
+```
