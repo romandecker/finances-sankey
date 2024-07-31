@@ -11,15 +11,19 @@
   "dependencies": {
     "next": "14.2.5",
     "npm": "^10.8.2",
+    "papaparse": "^5.4.1",
     "plotly.js": "^2.34.0",
     "react": "^18",
     "react-dom": "^18",
-    "react-plotly.js": "^2.6.0"
+    "react-plotly.js": "^2.6.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/papaparse": "^5.3.14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/wicg-file-system-access": "^2023.10.5",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "typescript": "^5"
