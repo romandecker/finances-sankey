@@ -34,6 +34,13 @@ export class CategoryRegistry {
 
     ingest(tx: Transaction) {
         const cat = this.get(tx.category);
+        if (!cat) {
+            console.warn(
+                `Unknown ${tx.type} category ${tx.category} for transaction`,
+                tx
+            );
+            return;
+        }
         cat.addTransaction(tx);
     }
 }

@@ -5,27 +5,42 @@ import {
     saveLocalStorage,
     Transaction,
 } from "../utils/storage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Category, CategoryRegistry } from "../utils/categories/category";
+import { ingest, IngestionResult } from "../utils/categories/ingest";
 
 const inter = Inter({ subsets: ["latin"] });
 
+interface AppState extends IngestionResult {
+    transactions: Transaction[];
+}
+
 export default function Home() {
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [appState, setAppState] = useState<AppState>({
+        transactions: [],
+        expenses: new CategoryRegistry(new Category({ names: ["Expenses"] })),
+        income: new CategoryRegistry(new Category({ names: ["Income"] })),
+    });
+
+    const loadState = useCallback(
+        (transactions: Transaction[]) =>
+            setAppState({ transactions, ...ingest(transactions) }),
+        [setAppState]
+    );
 
     useEffect(() => {
         const transactions = loadLocalStorage();
         if (transactions) {
-            setTransactions(transactions);
+            loadState(transactions);
         }
-    }, []);
+    }, [loadState]);
 
     return (
         <Button
             onClick={async () => {
                 const transactions = await importCsv();
-                setTransactions(transactions);
-                saveLocalStorage(transactions);
+                loadState(transactions);
             }}
         >
             Browse...
