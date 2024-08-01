@@ -6,6 +6,7 @@ import {
     Transaction,
 } from "../utils/storage";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export default function Home() {
     }, []);
 
     return (
-        <button
+        <Button
             onClick={async () => {
                 const transactions = await importCsv();
                 setTransactions(transactions);
@@ -28,6 +29,6 @@ export default function Home() {
             }}
         >
             Browse...
-        </button>
+        </Button>
     );
 }
