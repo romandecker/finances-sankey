@@ -36,7 +36,7 @@ export class CategoryRegistry {
         const cat = this.get(tx.category);
         if (!cat) {
             console.warn(
-                `Unknown ${tx.type} category ${tx.category} for transaction`,
+                `Unknown ${tx.type} category "${tx.category}" for transaction`,
                 tx
             );
             return;

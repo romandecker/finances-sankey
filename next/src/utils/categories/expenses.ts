@@ -188,11 +188,6 @@ export const createExpensesRegistry = () =>
                                 }),
                                 new Category({
                                     names: [
-                                        "Temporarily held money intended for another purpose",
-                                    ],
-                                }),
-                                new Category({
-                                    names: [
                                         "Unknown Expense",
                                         "UNKNOWN_CATEGORY",
                                     ],

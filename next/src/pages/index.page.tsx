@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Category, CategoryRegistry } from "../utils/categories/category";
 import { ingest, IngestionResult } from "../utils/categories/ingest";
+import { Sankey } from "./Sankey";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,13 +38,19 @@ export default function Home() {
     }, [loadState]);
 
     return (
-        <Button
-            onClick={async () => {
-                const transactions = await importCsv();
-                loadState(transactions);
-            }}
-        >
-            Browse...
-        </Button>
+        <>
+            <p>
+                <Button
+                    onClick={async () => {
+                        const transactions = await importCsv();
+                        loadState(transactions);
+                        saveLocalStorage(transactions);
+                    }}
+                >
+                    Browse...
+                </Button>
+            </p>
+            <Sankey />
+        </>
     );
 }

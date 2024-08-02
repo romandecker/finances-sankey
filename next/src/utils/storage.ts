@@ -86,7 +86,7 @@ export function loadLocalStorage(): Transaction[] | null {
     }
 
     const parsed = localStorageSchema.parse(raw);
-    console.log("Loaded", parsed.length, "from local storage");
+    console.log("Loaded", parsed.length, "transactions from local storage");
     return parsed;
 }
 
