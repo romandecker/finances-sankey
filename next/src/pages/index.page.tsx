@@ -8,17 +8,13 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Category, CategoryRegistry } from "../utils/categories/category";
-import { ingest, IngestionResult } from "../utils/categories/ingest";
-import { Sankey } from "./Sankey";
+import { ingest } from "../utils/categories/ingest";
+import { Sankey, SankeyProps } from "./Sankey";
 
 const inter = Inter({ subsets: ["latin"] });
 
-interface AppState extends IngestionResult {
-    transactions: Transaction[];
-}
-
 export default function Home() {
-    const [appState, setAppState] = useState<AppState>({
+    const [sankeyProps, setSankeyProps] = useState<SankeyProps>({
         transactions: [],
         expenses: new CategoryRegistry(new Category({ names: ["Expenses"] })),
         income: new CategoryRegistry(new Category({ names: ["Income"] })),
@@ -26,8 +22,8 @@ export default function Home() {
 
     const loadState = useCallback(
         (transactions: Transaction[]) =>
-            setAppState({ transactions, ...ingest(transactions) }),
-        [setAppState]
+            setSankeyProps({ transactions, ...ingest(transactions) }),
+        [setSankeyProps]
     );
 
     useEffect(() => {
@@ -50,7 +46,7 @@ export default function Home() {
                     Browse...
                 </Button>
             </p>
-            <Sankey />
+            <Sankey {...sankeyProps} />
         </>
     );
 }
