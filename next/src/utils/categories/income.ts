@@ -12,7 +12,10 @@ export const createIncomeRegistry = () =>
                 new Category({ names: ["Interests, dividends"] }),
                 new Category({
                     names: ["Lending, renting"],
-                    children: [new Category({ names: ["Splitwise credit"] })],
+                    children: [
+                        new Category({ names: ["Money returned to me"] }),
+                        new Category({ names: ["Splitwise credit"] }),
+                    ],
                 }),
                 new Category({ names: ["Lottery, gambling"] }),
                 new Category({ names: ["Refunds (tax, purchase)"] }),
@@ -22,17 +25,6 @@ export const createIncomeRegistry = () =>
                     children: [new Category({ names: ["Sale of securities"] })],
                 }),
                 new Category({ names: ["Wage, invoices"] }),
-
-                new Category({ names: ["Missing"] }),
-                // TODO: Fix this (they should only be here, not in expenses!)
-                new Category({
-                    names: [
-                        "Temporarily held money intended for another purpose",
-                    ],
-                }),
-                new Category({
-                    names: ["Returned lent out money"],
-                }),
             ],
         })
     );

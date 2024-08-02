@@ -181,7 +181,10 @@ export const createExpensesRegistry = () =>
                             children: [
                                 new Category({ names: ["Lent out money"] }),
                                 new Category({
-                                    names: ["Returned lent out money"],
+                                    names: [
+                                        "Money returned to owner",
+                                        "Returned lent out money",
+                                    ],
                                 }),
                                 new Category({
                                     names: [
