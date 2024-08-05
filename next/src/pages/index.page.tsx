@@ -9,36 +9,43 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sankey, SankeyProps } from "./Sankey";
 import { TransactionRegistry } from "../utils/ingest/TransactionRegistry";
-import { Category } from "../utils/ingest/Category.ts";
-import { ingest } from "../utils/ingest/ingest";
+import { Category } from "../utils/ingest/Category";
+import { createIncomeTree } from "../utils/ingest/income";
+import { createExpensesTree } from "../utils/ingest/expenses";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
     const [sankeyProps, setSankeyProps] = useState<SankeyProps>({
         transactions: [],
-        expenses: new TransactionRegistry(
-            new Category({ names: ["Expenses"] })
+        registry: new TransactionRegistry(
+            createIncomeTree(),
+            createExpensesTree()
         ),
-        income: new TransactionRegistry(new Category({ names: ["Income"] })),
     });
 
     const loadState = useCallback(
-        (transactions: Transaction[]) =>
-            setSankeyProps({ transactions, ...ingest(transactions) }),
+        (transactions: Transaction[]) => {
+            const registry = new TransactionRegistry(
+                createIncomeTree(),
+                createExpensesTree()
+            );
+            registry.ingest(transactions);
+            setSankeyProps({ transactions, registry });
+        },
         [setSankeyProps]
     );
 
     useEffect(() => {
-        const transactions = loadLocalStorage();
-        if (transactions) {
-            loadState(transactions);
-        }
+        // const transactions = loadLocalStorage();
+        // if (transactions) {
+        //     loadState(transactions);
+        // }
     }, [loadState]);
 
     return (
         <>
-            <p>
+            <div>
                 <Button
                     onClick={async () => {
                         const transactions = await importCsv();
@@ -48,7 +55,8 @@ export default function Home() {
                 >
                     Browse...
                 </Button>
-            </p>
+            </div>
+            <div></div>
             <Sankey {...sankeyProps} />
         </>
     );

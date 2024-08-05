@@ -1,5 +1,5 @@
-import { Transaction } from "../storage.js";
-import { Category } from "./Category.ts";
+import { Transaction } from "../storage";
+import { Category } from "./Category";
 
 describe("Category", () => {
     describe("#calculate_total", () => {

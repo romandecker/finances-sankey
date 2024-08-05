@@ -1,42 +1,62 @@
 import { Category } from "./Category";
-import { TransactionRegistry } from "./TransactionRegistry";
 
-export const createIncomeRegistry = () =>
-    new TransactionRegistry(
-        new Category({
-            names: ["Income"],
-            children: [
-                new Category({ names: ["Checks, coupons"] }),
-                new Category({ names: ["Child Support"] }),
-                new Category({ names: ["Dues & grants"] }),
-                new Category({ names: ["Gifts", "Gifts, joy"] }),
-                new Category({ names: ["Interests, dividends"] }),
-                new Category({
-                    names: ["Lending, renting"],
-                    children: [
-                        new Category({
-                            names: [
-                                "Money returned to me",
-                                "Returned lent out money",
-                            ],
-                        }),
-                        new Category({ names: ["Splitwise credit"] }),
-                        new Category({
-                            names: [
-                                "Temporarily held money intended for another purpose",
-                            ],
-                        }),
-                    ],
-                }),
-                new Category({ names: ["Lottery, gambling"] }),
-                new Category({ names: ["Refunds (tax, purchase)"] }),
-                new Category({ names: ["Rental income"] }),
-                new Category({
-                    names: ["Sale"],
-                    children: [new Category({ names: ["Sale of securities"] })],
-                }),
-                new Category({ names: ["Wage, invoices"] }),
-                new Category({ names: ["Missing", "UNKNOWN_CATEGORY"] }),
-            ],
-        })
-    );
+export const createIncomeTree = () =>
+    new Category({
+        names: ["Income"],
+        children: [
+            new Category({ names: ["Checks, coupons"], type: "Income" }),
+            new Category({ names: ["Child Support"], type: "Income" }),
+            new Category({ names: ["Dues & grants"], type: "Income" }),
+            new Category({
+                names: ["Gifts", "Gifts, joy"],
+                type: "Income",
+            }),
+            new Category({
+                names: ["Interests, dividends"],
+                type: "Income",
+            }),
+            new Category({
+                names: ["Lending, renting"],
+                children: [
+                    new Category({
+                        names: [
+                            "Money returned to me",
+                            "Returned lent out money",
+                        ],
+                        type: "Income",
+                    }),
+                    new Category({
+                        names: ["Splitwise credit"],
+                        type: "Income",
+                    }),
+                    new Category({
+                        names: [
+                            "Temporarily held money intended for another purpose",
+                        ],
+                        type: "Income",
+                    }),
+                ],
+            }),
+            new Category({ names: ["Lottery, gambling"], type: "Income" }),
+            new Category({
+                names: ["Refunds (tax, purchase)"],
+                type: "Income",
+            }),
+            new Category({ names: ["Rental income"], type: "Income" }),
+            new Category({
+                names: ["Sale"],
+                children: [
+                    new Category({
+                        names: ["Sale of securities"],
+                        type: "Income",
+                    }),
+                ],
+            }),
+            new Category({ names: ["Wage, invoices"], type: "Income" }),
+            new Category({
+                names: ["Missing", "UNKNOWN_CATEGORY"],
+                type: "Income",
+            }),
+        ],
+        type: "Income",
+    });
