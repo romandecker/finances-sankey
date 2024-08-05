@@ -1,16 +1,19 @@
 import { Transaction } from "../storage";
+import { Category } from "./Category";
 
 /**
  * This class takes care of quickly finding categories by name, simply pass a
  * categories (with children) and it will build a map for quick access
  **/
-export class CategoryRegistry {
+export class TransactionRegistry {
     categories: Record<string, Category>;
-    root: Category;
+    rootCategory: Category;
+    accounts: Set<string>;
 
     constructor(root: Category) {
-        this.root = root;
+        this.rootCategory = root;
         this.categories = {};
+        this.accounts = new Set();
 
         this.register(root);
     }
@@ -41,41 +44,7 @@ export class CategoryRegistry {
             );
             return;
         }
+        this.accounts.add(tx.account);
         cat.addTransaction(tx);
-    }
-}
-
-interface CategoryOptions {
-    names: [string, ...string[]];
-    children?: Category[];
-}
-
-export class Category {
-    names: readonly [string, ...string[]];
-    children: Category[];
-    private transactions: Transaction[];
-    amountInTransactions: number;
-
-    constructor({ names, children = [] }: CategoryOptions) {
-        this.names = names;
-        this.children = children;
-        this.transactions = [];
-        this.amountInTransactions = 0;
-    }
-
-    get name() {
-        return this.names[0];
-    }
-
-    addTransaction(transaction: Transaction) {
-        this.transactions.push(transaction);
-        this.amountInTransactions += transaction.amount;
-    }
-
-    calculateTotal(): number {
-        return this.children.reduce(
-            (acc, cat) => acc + cat.calculateTotal(),
-            this.amountInTransactions
-        );
     }
 }

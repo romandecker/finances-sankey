@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import useResizeObserver from "use-resize-observer";
 import { Transaction } from "../utils/storage";
-import { IngestionResult } from "../utils/categories/ingest";
+import { IngestionResult } from "../utils/ingest/ingest";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -40,7 +40,7 @@ export function Sankey({ transactions, income, expenses }: SankeyProps) {
     const offset = categories.length;
 
     source.push(0);
-    value.push(income.root.calculateTotal());
+    value.push(income.rootCategory.calculateTotal());
     target.push(offset);
 
     const expenseCategories = [...new Set(Object.values(expenses.categories))];

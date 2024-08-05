@@ -7,17 +7,20 @@ import {
 } from "../utils/storage";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Category, CategoryRegistry } from "../utils/categories/category";
-import { ingest } from "../utils/categories/ingest";
 import { Sankey, SankeyProps } from "./Sankey";
+import { TransactionRegistry } from "../utils/ingest/TransactionRegistry";
+import { Category } from "../utils/ingest/Category.ts";
+import { ingest } from "../utils/ingest/ingest";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
     const [sankeyProps, setSankeyProps] = useState<SankeyProps>({
         transactions: [],
-        expenses: new CategoryRegistry(new Category({ names: ["Expenses"] })),
-        income: new CategoryRegistry(new Category({ names: ["Income"] })),
+        expenses: new TransactionRegistry(
+            new Category({ names: ["Expenses"] })
+        ),
+        income: new TransactionRegistry(new Category({ names: ["Income"] })),
     });
 
     const loadState = useCallback(

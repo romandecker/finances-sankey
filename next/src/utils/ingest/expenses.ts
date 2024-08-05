@@ -1,7 +1,8 @@
-import { Category, CategoryRegistry } from "./category";
+import { Category } from "./Category";
+import { TransactionRegistry } from "./TransactionRegistry";
 
 export const createExpensesRegistry = () =>
-    new CategoryRegistry(
+    new TransactionRegistry(
         new Category({
             names: ["Expenses"],
             children: [

@@ -1,11 +1,11 @@
 import { Transaction } from "../storage";
-import { CategoryRegistry } from "./category";
 import { createExpensesRegistry } from "./expenses";
 import { createIncomeRegistry } from "./income";
+import { TransactionRegistry } from "./TransactionRegistry";
 
 export interface IngestionResult {
-    expenses: CategoryRegistry;
-    income: CategoryRegistry;
+    expenses: TransactionRegistry;
+    income: TransactionRegistry;
 }
 
 export function ingest(transactions: Transaction[]) {
