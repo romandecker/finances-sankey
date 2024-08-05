@@ -52,6 +52,10 @@ export class TransactionRegistry {
         return this.roots[type].categories[name];
     }
 
+    getAccounts() {
+        return [...this.accounts].sort();
+    }
+
     private register(category: Category) {
         for (const name of category.names) {
             if (this.roots[category.type].categories[name]) {

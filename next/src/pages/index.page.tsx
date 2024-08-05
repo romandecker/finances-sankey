@@ -9,9 +9,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sankey, SankeyProps } from "./Sankey";
 import { TransactionRegistry } from "../utils/ingest/TransactionRegistry";
-import { Category } from "../utils/ingest/Category";
 import { createIncomeTree } from "../utils/ingest/income";
 import { createExpensesTree } from "../utils/ingest/expenses";
+import { Filters } from "./Filters";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,10 +37,10 @@ export default function Home() {
     );
 
     useEffect(() => {
-        // const transactions = loadLocalStorage();
-        // if (transactions) {
-        //     loadState(transactions);
-        // }
+        const transactions = loadLocalStorage();
+        if (transactions) {
+            loadState(transactions);
+        }
     }, [loadState]);
 
     return (
@@ -56,7 +56,10 @@ export default function Home() {
                     Browse...
                 </Button>
             </div>
-            <div></div>
+            <Filters
+                availableAccounts={[...sankeyProps.registry.getAccounts()]}
+                filters={{ accounts: [] }}
+            ></Filters>
             <Sankey {...sankeyProps} />
         </>
     );
