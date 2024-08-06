@@ -1,5 +1,11 @@
+/**
+ * This interface takes care of quickly finding categories by name, simply pass a
+ * categories (with children) and it will build a map for quick access
+ **/
+
+import { Filters, isIncludedByFilters } from "../../pages/Filters";
 import { Transaction } from "../storage";
-import { Category } from "./Category";
+import { Category, addTransaction } from "./Category";
 
 interface Transfer {
     from: string;
@@ -12,11 +18,7 @@ const OPPOSITE_TYPES = {
     Expenses: "Income",
 } as const;
 
-/**
- * This class takes care of quickly finding categories by name, simply pass a
- * categories (with children) and it will build a map for quick access
- **/
-export class TransactionRegistry {
+export interface TransactionRegistry {
     roots: {
         Income: {
             root: Category;
@@ -30,9 +32,17 @@ export class TransactionRegistry {
 
     accounts: Set<string>;
     accountTransfers: Transfer[];
+    ingestedTransactions: Transaction[];
+    filters: Filters;
+}
 
-    constructor(incomeTree: Category, expensesTree: Category) {
-        this.roots = {
+export function makeTransactionRegistry(
+    incomeTree: Category,
+    expensesTree: Category,
+    filters: Filters = {}
+) {
+    const registry = {
+        roots: {
             Income: {
                 root: incomeTree,
                 categories: {},
@@ -41,91 +51,118 @@ export class TransactionRegistry {
                 root: expensesTree,
                 categories: {},
             },
-        };
-        this.accounts = new Set();
-        this.accountTransfers = [];
-        this.register(incomeTree);
-        this.register(expensesTree);
+        },
+        accounts: new Set<string>(),
+        accountTransfers: [],
+        ingestedTransactions: [],
+        filters,
+    };
+
+    register(registry, incomeTree);
+    register(registry, expensesTree);
+
+    return registry;
+}
+
+function register(registry: TransactionRegistry, category: Category) {
+    for (const name of category.names) {
+        if (registry.roots[category.type].categories[name]) {
+            throw new Error(`Duplicate category (or alias) "${name}"`);
+        }
+        registry.roots[category.type].categories[name] = category;
     }
 
-    get(name: string, type: Transaction["type"] = "Expenses") {
-        return this.roots[type].categories[name];
+    for (const child of category.children) {
+        register(registry, child);
     }
+}
 
-    getAccounts() {
-        return [...this.accounts].sort();
+export function getCategory(
+    registry: TransactionRegistry,
+    name: string,
+    type: Transaction["type"] = "Expenses"
+) {
+    return registry.roots[type].categories[name];
+}
+
+export function getAccounts(registry: TransactionRegistry) {
+    return [...registry.accounts].sort();
+}
+
+function ingestTransfer(
+    registry: TransactionRegistry,
+    openTransfers: Transaction[],
+    tx: Transaction
+) {
+    const oppositeType = OPPOSITE_TYPES[tx.type];
+    const oppositeIndex = openTransfers.findIndex(
+        (candidate) =>
+            candidate.type === oppositeType &&
+            candidate.currency === tx.currency &&
+            candidate.amount === -tx.amount
+    );
+
+    if (oppositeIndex >= 0) {
+        const [sourceTx, destTx] =
+            tx.type === "Expenses"
+                ? [tx, openTransfers[oppositeIndex]]
+                : [openTransfers[oppositeIndex], tx];
+
+        registry.accountTransfers.push({
+            from: sourceTx.account,
+            to: destTx.account,
+            amount: destTx.amount,
+        });
+
+        registry.accounts.add(sourceTx.account);
+        registry.accounts.add(destTx.account);
+
+        openTransfers.splice(oppositeIndex, 1);
+    } else {
+        openTransfers.push(tx);
     }
+}
 
-    private register(category: Category) {
-        for (const name of category.names) {
-            if (this.roots[category.type].categories[name]) {
-                throw new Error(`Duplicate category (or alias) "${name}"`);
-            }
-            this.roots[category.type].categories[name] = category;
+export function ingest(
+    registry: TransactionRegistry,
+    transactions: Transaction[]
+) {
+    const openTransfers: Transaction[] = [];
+
+    for (const tx of transactions) {
+        registry.ingestedTransactions.push(tx);
+        registry.accounts.add(tx.account);
+
+        if (!isIncludedByFilters(registry.filters, tx)) {
+            // console.log("skipped", tx);
+            continue;
         }
 
-        for (const child of category.children) {
-            this.register(child);
-        }
-    }
-
-    private ingestTransfer(openTransfers: Transaction[], tx: Transaction) {
-        const oppositeType = OPPOSITE_TYPES[tx.type];
-        const oppositeIndex = openTransfers.findIndex(
-            (candidate) =>
-                candidate.type === oppositeType &&
-                candidate.currency === tx.currency &&
-                candidate.amount === -tx.amount
-        );
-
-        if (oppositeIndex >= 0) {
-            const [sourceTx, destTx] =
-                tx.type === "Expenses"
-                    ? [tx, openTransfers[oppositeIndex]]
-                    : [openTransfers[oppositeIndex], tx];
-
-            this.accountTransfers.push({
-                from: sourceTx.account,
-                to: destTx.account,
-                amount: destTx.amount,
-            });
-
-            this.accounts.add(sourceTx.account);
-            this.accounts.add(destTx.account);
-
-            openTransfers.splice(oppositeIndex, 1);
-        } else {
-            openTransfers.push(tx);
-        }
-    }
-
-    ingest(transactions: Transaction[]) {
-        const openTransfers: Transaction[] = [];
-
-        for (const tx of transactions) {
-            if (tx.transfer) {
-                this.ingestTransfer(openTransfers, tx);
-                continue;
-            }
-
-            const cat = this.get(tx.category, tx.type);
-
-            if (!cat) {
-                console.warn(
-                    `Unknown ${tx.type} category "${tx.category}" for transaction`,
-                    tx
-                );
-                continue;
-            }
-            this.accounts.add(tx.account);
-            cat.addTransaction(tx);
+        if (tx.transfer) {
+            ingestTransfer(registry, openTransfers, tx);
+            continue;
         }
 
-        if (openTransfers.length) {
+        const cat = getCategory(registry, tx.category, tx.type);
+
+        if (!cat) {
             console.warn(
-                "Encountered some transfers without matching pairs:",
-                openTransfers.map((tx) => `${tx.amount} ${tx.note}`)
+                `Unknown ${tx.type} category "${tx.category}" for transaction`,
+                tx
             );
+            continue;
         }
+        addTransaction(cat, tx);
+    }
+
+    if (!registry.filters.accounts) {
+        registry.filters.accounts = getAccounts(registry);
+    }
+
+    if (openTransfers.length) {
+        console.warn(
+            "Encountered some transfers without matching pairs:",
+            openTransfers.map((tx) => `${tx.amount} ${tx.note}`)
+        );
     }
 }

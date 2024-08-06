@@ -1,17 +1,22 @@
-import { RadioGroupItem } from "@radix-ui/react-radio-group";
-import { RadioGroup } from "../components/ui/radio-group";
-import { Label } from "../components/ui/label";
 import { Checkbox } from "../components/ui/checkbox";
 import { PropsWithChildren } from "react";
-import { Card, CardContent } from "../components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+} from "../components/ui/card";
+import { Transaction } from "../utils/storage";
 
 function FilterCheckbox({
     id,
     children,
     onChange,
+    isChecked,
 }: PropsWithChildren<{
     id: string;
     onChange?: (isChecked: boolean, id: string) => void;
+    isChecked?: boolean;
 }>) {
     return (
         <div className="flex items-center space-x-2">
@@ -20,6 +25,7 @@ function FilterCheckbox({
                 onCheckedChange={(checkedState) =>
                     onChange?.(checkedState === true, id)
                 }
+                checked={isChecked}
             />
             <label
                 htmlFor={id}
@@ -39,7 +45,15 @@ export interface FiltersProps {
 }
 
 export interface Filters {
-    accounts: string[];
+    accounts?: string[];
+}
+
+export function isIncludedByFilters(filters: Filters, tx: Transaction) {
+    if (filters.accounts) {
+        return filters.accounts.includes(tx.account);
+    } else {
+        return true;
+    }
 }
 
 export function Filters({
@@ -51,18 +65,24 @@ export function Filters({
         onFiltersChanged?.({
             ...filters,
             accounts: isChecked
-                ? [...filters.accounts, account]
-                : filters.accounts.filter((a) => a !== account),
+                ? [...(filters.accounts ?? []), account]
+                : (filters.accounts ?? []).filter((a) => a !== account),
         });
 
     return (
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 p-2">
             <Card>
+                <CardHeader className="p-2">
+                    <CardDescription>Accounts</CardDescription>
+                </CardHeader>
+
                 <CardContent className="flex flex-col gap-1 p-2">
                     {availableAccounts.map((account) => (
                         <FilterCheckbox
                             id={account}
+                            key={account}
                             onChange={onAccountCheckedChanged}
+                            isChecked={filters.accounts?.includes(account)}
                         >
                             {account}
                         </FilterCheckbox>

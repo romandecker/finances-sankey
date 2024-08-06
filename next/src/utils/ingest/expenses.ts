@@ -1,152 +1,151 @@
-import { Category } from "./Category";
-import { TransactionRegistry } from "./TransactionRegistry";
+import { makeCategory } from "./Category";
 
 export const createExpensesTree = () =>
-    new Category({
+    makeCategory({
         names: ["Expenses"],
         children: [
-            new Category({
+            makeCategory({
                 names: ["Food & Beverages", "Food & Drinks"],
                 children: [
-                    new Category({
+                    makeCategory({
                         names: ["Bar, Cafe", "Bar, cafe"],
                     }),
-                    new Category({
+                    makeCategory({
                         names: ["Groceries"],
-                        children: [new Category({ names: ["Meal Kits"] })],
+                        children: [makeCategory({ names: ["Meal Kits"] })],
                     }),
-                    new Category({
+                    makeCategory({
                         names: ["Restaurant, fast-food"],
                         children: [
-                            new Category({ names: ["Deli"] }),
-                            new Category({ names: ["Food delivery"] }),
+                            makeCategory({ names: ["Deli"] }),
+                            makeCategory({ names: ["Food delivery"] }),
                         ],
                     }),
                 ],
             }),
-            new Category({
+            makeCategory({
                 names: ["Shopping"],
                 children: [
-                    new Category({
+                    makeCategory({
                         names: ["Clothes & Footwear", "Clothes & shoes"],
                     }),
-                    new Category({ names: ["Drug-store, chemist"] }),
-                    new Category({ names: ["Electronics, accessories"] }),
-                    new Category({
+                    makeCategory({ names: ["Drug-store, chemist"] }),
+                    makeCategory({ names: ["Electronics, accessories"] }),
+                    makeCategory({
                         names: ["Gifts, joy", "Gifts"],
                     }),
-                    new Category({ names: ["Health and beauty"] }),
-                    new Category({ names: ["Home, garden"] }),
-                    new Category({ names: ["Jewels, accessories"] }),
-                    new Category({ names: ["Kids"] }),
-                    new Category({ names: ["Leisure time"] }),
-                    new Category({ names: ["Pets, animals"] }),
-                    new Category({ names: ["Stationery, tools"] }),
+                    makeCategory({ names: ["Health and beauty"] }),
+                    makeCategory({ names: ["Home, garden"] }),
+                    makeCategory({ names: ["Jewels, accessories"] }),
+                    makeCategory({ names: ["Kids"] }),
+                    makeCategory({ names: ["Leisure time"] }),
+                    makeCategory({ names: ["Pets, animals"] }),
+                    makeCategory({ names: ["Stationery, tools"] }),
                 ],
             }),
-            new Category({
+            makeCategory({
                 names: ["Housing"],
                 children: [
-                    new Category({
+                    makeCategory({
                         names: ["Energy, utilities"],
                         children: [
-                            new Category({ names: ["Electricity"] }),
-                            new Category({ names: ["Heating"] }),
+                            makeCategory({ names: ["Electricity"] }),
+                            makeCategory({ names: ["Heating"] }),
                         ],
                     }),
-                    new Category({ names: ["Maintenance, repairs"] }),
-                    new Category({ names: ["Mortgage"] }),
-                    new Category({ names: ["Property insurance"] }),
-                    new Category({ names: ["Rent"] }),
-                    new Category({ names: ["Services"] }),
+                    makeCategory({ names: ["Maintenance, repairs"] }),
+                    makeCategory({ names: ["Mortgage"] }),
+                    makeCategory({ names: ["Property insurance"] }),
+                    makeCategory({ names: ["Rent"] }),
+                    makeCategory({ names: ["Services"] }),
                 ],
             }),
-            new Category({
+            makeCategory({
                 names: ["Transportation"],
                 children: [
-                    new Category({ names: ["Business trips"] }),
-                    new Category({ names: ["Long distance"] }),
-                    new Category({
+                    makeCategory({ names: ["Business trips"] }),
+                    makeCategory({ names: ["Long distance"] }),
+                    makeCategory({
                         names: ["Public transport"],
-                        children: [new Category({ names: ["Train"] })],
+                        children: [makeCategory({ names: ["Train"] })],
                     }),
-                    new Category({ names: ["Taxi"] }),
+                    makeCategory({ names: ["Taxi"] }),
                 ],
             }),
-            new Category({
+            makeCategory({
                 names: ["Vehicle"],
                 children: [
-                    new Category({ names: ["Fuel"] }),
-                    new Category({ names: ["Leasing"] }),
-                    new Category({ names: ["Parking"] }),
-                    new Category({ names: ["Rentals"] }),
-                    new Category({ names: ["Vehicle insurance"] }),
-                    new Category({ names: ["Vehicle maintenance"] }),
+                    makeCategory({ names: ["Fuel"] }),
+                    makeCategory({ names: ["Leasing"] }),
+                    makeCategory({ names: ["Parking"] }),
+                    makeCategory({ names: ["Rentals"] }),
+                    makeCategory({ names: ["Vehicle insurance"] }),
+                    makeCategory({ names: ["Vehicle maintenance"] }),
                 ],
             }),
-            new Category({
+            makeCategory({
                 names: ["Life & Entertainment"],
                 children: [
-                    new Category({ names: ["Active sport, fitness"] }),
-                    new Category({ names: ["Alcohol, tobacco"] }),
-                    new Category({
+                    makeCategory({ names: ["Active sport, fitness"] }),
+                    makeCategory({ names: ["Alcohol, tobacco"] }),
+                    makeCategory({
                         names: ["Books, audio, subscriptions"],
                     }),
-                    new Category({
+                    makeCategory({
                         names: ["Charity, gifts"],
-                        children: [new Category({ names: ["Donations"] })],
+                        children: [makeCategory({ names: ["Donations"] })],
                     }),
-                    new Category({ names: ["Culture, sport events"] }),
-                    new Category({ names: ["Education, development"] }),
-                    new Category({
+                    makeCategory({ names: ["Culture, sport events"] }),
+                    makeCategory({ names: ["Education, development"] }),
+                    makeCategory({
                         names: ["Health care, doctor"],
                         children: [
-                            new Category({
+                            makeCategory({
                                 names: ["Medical treatment, therapy"],
                             }),
-                            new Category({ names: ["Medicine"] }),
+                            makeCategory({ names: ["Medicine"] }),
                         ],
                     }),
-                    new Category({
+                    makeCategory({
                         names: ["Hobbies", "Free time"],
                     }),
-                    new Category({ names: ["Holiday, trips, hotels"] }),
-                    new Category({ names: ["Life events"] }),
-                    new Category({ names: ["Lottery, gambling"] }),
-                    new Category({ names: ["TV, Streaming"] }),
-                    new Category({ names: ["Wellness, beauty"] }),
+                    makeCategory({ names: ["Holiday, trips, hotels"] }),
+                    makeCategory({ names: ["Life events"] }),
+                    makeCategory({ names: ["Lottery, gambling"] }),
+                    makeCategory({ names: ["TV, Streaming"] }),
+                    makeCategory({ names: ["Wellness, beauty"] }),
                 ],
             }),
-            new Category({
+            makeCategory({
                 names: ["Communication, PC"],
                 children: [
-                    new Category({ names: ["Internet"] }),
-                    new Category({ names: ["Postal services"] }),
-                    new Category({
+                    makeCategory({ names: ["Internet"] }),
+                    makeCategory({ names: ["Postal services"] }),
+                    makeCategory({
                         names: ["Software, apps, games"],
-                        children: [new Category({ names: ["Gaming"] })],
+                        children: [makeCategory({ names: ["Gaming"] })],
                     }),
-                    new Category({
+                    makeCategory({
                         names: ["Telephony, mobile phone", "Phone, cell phone"],
                     }),
                 ],
             }),
 
-            new Category({
+            makeCategory({
                 names: ["Financial expenses"],
                 children: [
-                    new Category({ names: ["Advisory"] }),
-                    new Category({ names: ["Charges, Fees"] }),
-                    new Category({ names: ["Child Support"] }),
-                    new Category({ names: ["Fines"] }),
-                    new Category({ names: ["Insurances"] }),
-                    new Category({
+                    makeCategory({ names: ["Advisory"] }),
+                    makeCategory({ names: ["Charges, Fees"] }),
+                    makeCategory({ names: ["Child Support"] }),
+                    makeCategory({ names: ["Fines"] }),
+                    makeCategory({ names: ["Insurances"] }),
+                    makeCategory({
                         names: ["Loans, interests", "Loan, interests"],
                     }),
-                    new Category({
+                    makeCategory({
                         names: ["Taxes"],
                         children: [
-                            new Category({
+                            makeCategory({
                                 names: ["DDI (Ausschüttungsgleicher Ertrag)"],
                             }),
                         ],
@@ -154,34 +153,34 @@ export const createExpensesTree = () =>
                 ],
             }),
 
-            new Category({
+            makeCategory({
                 names: ["Investments"],
                 children: [
-                    new Category({ names: ["Collections"] }),
-                    new Category({
+                    makeCategory({ names: ["Collections"] }),
+                    makeCategory({
                         names: ["Financial investments"],
-                        children: [new Category({ names: ["Crypto"] })],
+                        children: [makeCategory({ names: ["Crypto"] })],
                     }),
-                    new Category({ names: ["Realty"] }),
-                    new Category({ names: ["Savings"] }),
-                    new Category({ names: ["Vehicles, chattels"] }),
+                    makeCategory({ names: ["Realty"] }),
+                    makeCategory({ names: ["Savings"] }),
+                    makeCategory({ names: ["Vehicles, chattels"] }),
                 ],
             }),
 
-            new Category({
+            makeCategory({
                 names: ["Others"],
                 children: [
-                    new Category({
+                    makeCategory({
                         names: ["Missing"],
                         children: [
-                            new Category({ names: ["Lent out money"] }),
-                            new Category({
+                            makeCategory({ names: ["Lent out money"] }),
+                            makeCategory({
                                 names: [
                                     "Money returned to owner",
                                     "Returned lent out money",
                                 ],
                             }),
-                            new Category({
+                            makeCategory({
                                 names: ["Unknown Expense", "UNKNOWN_CATEGORY"],
                             }),
                         ],

@@ -1,35 +1,35 @@
-import { Category } from "./Category";
+import { makeCategory } from "./Category";
 
 export const createIncomeTree = () =>
-    new Category({
+    makeCategory({
         names: ["Income"],
         children: [
-            new Category({ names: ["Checks, coupons"], type: "Income" }),
-            new Category({ names: ["Child Support"], type: "Income" }),
-            new Category({ names: ["Dues & grants"], type: "Income" }),
-            new Category({
+            makeCategory({ names: ["Checks, coupons"], type: "Income" }),
+            makeCategory({ names: ["Child Support"], type: "Income" }),
+            makeCategory({ names: ["Dues & grants"], type: "Income" }),
+            makeCategory({
                 names: ["Gifts", "Gifts, joy"],
                 type: "Income",
             }),
-            new Category({
+            makeCategory({
                 names: ["Interests, dividends"],
                 type: "Income",
             }),
-            new Category({
+            makeCategory({
                 names: ["Lending, renting"],
                 children: [
-                    new Category({
+                    makeCategory({
                         names: [
                             "Money returned to me",
                             "Returned lent out money",
                         ],
                         type: "Income",
                     }),
-                    new Category({
+                    makeCategory({
                         names: ["Splitwise credit"],
                         type: "Income",
                     }),
-                    new Category({
+                    makeCategory({
                         names: [
                             "Temporarily held money intended for another purpose",
                         ],
@@ -37,23 +37,23 @@ export const createIncomeTree = () =>
                     }),
                 ],
             }),
-            new Category({ names: ["Lottery, gambling"], type: "Income" }),
-            new Category({
+            makeCategory({ names: ["Lottery, gambling"], type: "Income" }),
+            makeCategory({
                 names: ["Refunds (tax, purchase)"],
                 type: "Income",
             }),
-            new Category({ names: ["Rental income"], type: "Income" }),
-            new Category({
+            makeCategory({ names: ["Rental income"], type: "Income" }),
+            makeCategory({
                 names: ["Sale"],
                 children: [
-                    new Category({
+                    makeCategory({
                         names: ["Sale of securities"],
                         type: "Income",
                     }),
                 ],
             }),
-            new Category({ names: ["Wage, invoices"], type: "Income" }),
-            new Category({
+            makeCategory({ names: ["Wage, invoices"], type: "Income" }),
+            makeCategory({
                 names: ["Missing", "UNKNOWN_CATEGORY"],
                 type: "Income",
             }),

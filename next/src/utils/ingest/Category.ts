@@ -6,34 +6,54 @@ interface CategoryOptions {
     type?: Transaction["type"];
 }
 
-export class Category {
-    names: readonly [string, ...string[]];
+export interface Category {
+    names: [string, ...string[]];
     children: Category[];
-    private transactions: Transaction[];
+    transactions: Transaction[];
     amountInTransactions: number;
     type: Transaction["type"];
+}
 
-    constructor({ names, children = [], type = "Expenses" }: CategoryOptions) {
-        this.names = names;
-        this.children = children;
-        this.transactions = [];
-        this.amountInTransactions = 0;
-        this.type = type;
-    }
+export function makeCategory({
+    names,
+    children = [],
+    type = "Expenses",
+}: CategoryOptions) {
+    return {
+        names,
+        children,
+        type,
 
-    get name() {
-        return this.names[0];
-    }
+        transactions: [],
+        amountInTransactions: 0,
+    };
+}
 
-    addTransaction(transaction: Transaction) {
-        this.transactions.push(transaction);
-        this.amountInTransactions += transaction.amount;
-    }
+/**
+ * Create a clone of the current category and all its children, without any transactions
+ */
+export function emptyDeepClone(original: Category): Category {
+    const clone = makeCategory({
+        names: [...original.names],
+        children: original.children.map(emptyDeepClone),
+        type: original.type,
+    });
 
-    calculateTotal(): number {
-        return this.children.reduce(
-            (acc, cat) => acc + cat.calculateTotal(),
-            this.amountInTransactions
-        );
-    }
+    return clone;
+}
+
+export function getName(cat: Category) {
+    return cat.names[0];
+}
+
+export function addTransaction(cat: Category, transaction: Transaction) {
+    cat.transactions.push(transaction);
+    cat.amountInTransactions += transaction.amount;
+}
+
+export function calculateTotal(root: Category): number {
+    return root.children.reduce(
+        (acc, cat) => acc + calculateTotal(cat),
+        root.amountInTransactions
+    );
 }
