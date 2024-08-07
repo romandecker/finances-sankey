@@ -3,9 +3,11 @@
  * categories (with children) and it will build a map for quick access
  **/
 
+import { SankeyData } from "plotly.js";
 import { Filters, isIncludedByFilters } from "../../pages/Filters";
 import { Transaction } from "../storage";
-import { Category, addTransaction } from "./Category";
+import { addTransaction, calculateTotal, Category, getName } from "./Category";
+import { SankeyProps } from "../../pages/Sankey";
 
 interface Transfer {
     from: string;
@@ -165,4 +167,51 @@ export function ingest(
             openTransfers.map((tx) => `${tx.amount} ${tx.note}`)
         );
     }
+}
+
+export function createSankeyData(registry: TransactionRegistry): SankeyProps {
+    const categories = [
+        ...new Set(Object.values(registry.roots.Income.categories)),
+    ];
+    const labels = categories.map(getName);
+    const source: number[] = [];
+    const target: number[] = [];
+    const value: number[] = [];
+    for (let i = 0; i < categories.length; i++) {
+        const category = categories[i];
+        for (const child of category.children) {
+            const childIndex = labels.indexOf(getName(child));
+            source.push(childIndex);
+            value.push(calculateTotal(child));
+            target.push(i);
+        }
+    }
+
+    const offset = categories.length;
+
+    source.push(0);
+    value.push(calculateTotal(registry.roots.Income.root));
+    target.push(offset);
+
+    const expenseCategories = [
+        ...new Set(Object.values(registry.roots.Expenses.categories)),
+    ];
+    const expenseLabels = expenseCategories.map((cat) => getName(cat));
+    categories.push(...expenseCategories);
+    labels.push(...expenseLabels);
+    for (let i = offset; i < categories.length; i++) {
+        const category = categories[i];
+        for (const child of category.children) {
+            const childIndex = offset + expenseLabels.indexOf(getName(child));
+            source.push(i);
+            value.push(-calculateTotal(child));
+            target.push(childIndex);
+        }
+    }
+
+    return {
+        label: labels,
+        link: { source, target, value },
+        transactionCount: registry.ingestedTransactions.length,
+    } satisfies SankeyProps;
 }

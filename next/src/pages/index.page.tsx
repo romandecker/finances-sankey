@@ -7,7 +7,7 @@ import {
 } from "../utils/storage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sankey } from "./Sankey";
+import { Sankey, SankeyProps } from "./Sankey";
 import {
     TransactionRegistry,
     getAccounts,
@@ -25,39 +25,71 @@ import {
 
 const inter = Inter({ subsets: ["latin"] });
 
+interface WorkerContext {
+    registry: TransactionRegistry;
+    sankeyData?: SankeyProps;
+}
+
 function useWorker() {
-    const [pendingMessageCount, setPendingMessageCount] = useState(0);
+    const currentMessageIdRef = useRef(0);
+    const lastMessageIdRef = useRef(0);
     const [filters, setFilters] = useState<Filters>({});
-    const [registry, setRegistry] = useState<TransactionRegistry>(
-        makeTransactionRegistry(createIncomeTree(), createExpensesTree())
-    );
+    const [context, setWorkerContext] = useState<WorkerContext>({
+        registry: makeTransactionRegistry(
+            createIncomeTree(),
+            createExpensesTree()
+        ),
+    });
     const workerRef = useRef<Worker>();
 
-    const setTransactions = useCallback((transactions: Transaction[]) => {
-        setPendingMessageCount((c) => c + 1);
-        workerRef.current?.postMessage({
-            type: "INIT",
-            transactions,
-        } satisfies InitMessage);
-    }, []);
+    const postMessage = useCallback(
+        <M extends Message>(message: Omit<M, "id">) => {
+            currentMessageIdRef.current++;
+            const msg = {
+                ...message,
+                id: currentMessageIdRef.current,
+            };
+            console.log("Sending message", msg);
+            workerRef.current?.postMessage(msg);
+        },
+        []
+    );
 
-    const applyFilters = useCallback((filters: Filters) => {
-        setPendingMessageCount((c) => c + 1);
-        setFilters(filters);
-        workerRef.current?.postMessage({
-            type: "FILTER",
-            filters,
-        } satisfies FilterMessage);
-    }, []);
+    const setTransactions = useCallback(
+        (transactions: Transaction[]) => {
+            postMessage<InitMessage>({
+                type: "INIT",
+                transactions,
+            });
+        },
+        [postMessage]
+    );
+
+    const applyFilters = useCallback(
+        (filters: Filters) => {
+            setFilters(filters);
+            postMessage<FilterMessage>({
+                type: "FILTER",
+                filters,
+            });
+        },
+        [postMessage]
+    );
 
     useEffect(() => {
         workerRef.current = new Worker(
             new URL("../utils/worker.ts", import.meta.url)
         );
         workerRef.current.onmessage = (event: MessageEvent<Message>) => {
+            lastMessageIdRef.current = event.data.id;
             if (event.data.type === "RESULT") {
-                setPendingMessageCount((c) => c - 1);
-                setRegistry(event.data.registry);
+                if (currentMessageIdRef.current !== lastMessageIdRef.current) {
+                    console.warn("Skipping stale message", event.data);
+                    return;
+                }
+
+                console.log("got", event.data);
+                setWorkerContext(event.data);
                 setFilters((currentFilters) => {
                     // make sure to only set filters when there are none
                     if (currentFilters.accounts) {
@@ -75,32 +107,43 @@ function useWorker() {
 
         const transactions = loadLocalStorage();
         if (transactions) {
-            workerRef.current.postMessage({
+            postMessage<InitMessage>({
                 type: "INIT",
                 transactions,
-            } satisfies InitMessage);
+            });
         }
 
         return () => {
             workerRef.current?.terminate();
         };
-    }, []);
+    }, [postMessage]);
+
+    const isLoading = currentMessageIdRef.current !== lastMessageIdRef.current;
+    console.log(currentMessageIdRef.current, lastMessageIdRef.current);
 
     return useMemo(
         () => ({
-            isLoading: pendingMessageCount === 0,
+            isLoading,
             setTransactions,
             applyFilters,
-            registry,
             filters,
+            ...context,
         }),
-        [pendingMessageCount === 0, registry, filters]
+        [isLoading, context, filters, applyFilters, setTransactions]
     );
 }
 
 export default function Home() {
-    const { isLoading, applyFilters, setTransactions, registry, filters } =
-        useWorker();
+    const {
+        isLoading,
+        applyFilters,
+        setTransactions,
+        registry,
+        filters,
+        sankeyData,
+    } = useWorker();
+
+    console.log({ isLoading, sankeyData });
 
     return (
         <>
@@ -120,10 +163,10 @@ export default function Home() {
                 filters={filters}
                 onFiltersChanged={applyFilters}
             />
-            {isLoading ? (
+            {isLoading || !sankeyData ? (
                 <span>Loading...</span>
             ) : (
-                <Sankey registry={registry} />
+                <Sankey {...sankeyData} />
             )}
         </>
     );
