@@ -119,7 +119,6 @@ function useWorker() {
     }, [postMessage]);
 
     const isLoading = currentMessageIdRef.current !== lastMessageIdRef.current;
-    console.log(currentMessageIdRef.current, lastMessageIdRef.current);
 
     return useMemo(
         () => ({
@@ -142,8 +141,6 @@ export default function Home() {
         filters,
         sankeyData,
     } = useWorker();
-
-    console.log({ isLoading, sankeyData });
 
     return (
         <>

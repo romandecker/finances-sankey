@@ -7,6 +7,7 @@ import {
     CardHeader,
 } from "../components/ui/card";
 import { Transaction } from "../utils/storage";
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 
 function FilterCheckbox({
     id,
@@ -46,14 +47,14 @@ export interface FiltersProps {
 
 export interface Filters {
     accounts?: string[];
+    type: Transaction["type"];
 }
 
 export function isIncludedByFilters(filters: Filters, tx: Transaction) {
-    if (filters.accounts) {
-        return filters.accounts.includes(tx.account);
-    } else {
-        return true;
-    }
+    return (
+        filters.type === tx.type &&
+        (!filters.accounts || filters.accounts.includes(tx.account))
+    );
 }
 
 export function Filters({
@@ -68,6 +69,8 @@ export function Filters({
                 ? [...(filters.accounts ?? []), account]
                 : (filters.accounts ?? []).filter((a) => a !== account),
         });
+
+    const onTypeChanged = () => {};
 
     return (
         <div className="flex flex-row gap-2 p-2">
@@ -88,6 +91,34 @@ export function Filters({
                         </FilterCheckbox>
                     ))}
                 </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="p-2">
+                    <CardDescription>Type</CardDescription>
+                </CardHeader>
+                <CardHeader>
+                    <RadioGroup
+                        defaultValue="Expenses"
+                        onChange={(e) => console.log("#####", e)}
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                                onChange={(e) => console.log("#####", e)}
+                                value="Expenses"
+                                id="radio-Expenses"
+                            />
+                            <label htmlFor="radio-Expenses">Expenses</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                                value="Income"
+                                id="radio-Income"
+                                onChange={(e) => console.log("#####", e)}
+                            />
+                            <label htmlFor="radio-Income">Income</label>
+                        </div>
+                    </RadioGroup>
+                </CardHeader>
             </Card>
         </div>
     );

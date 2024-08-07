@@ -12,6 +12,8 @@ export interface Category {
     transactions: Transaction[];
     amountInTransactions: number;
     type: Transaction["type"];
+
+    accounts: Record<string, number>;
 }
 
 export function makeCategory({
@@ -25,6 +27,7 @@ export function makeCategory({
         type,
 
         transactions: [],
+        accounts: {},
         amountInTransactions: 0,
     };
 }
@@ -48,6 +51,10 @@ export function getName(cat: Category) {
 
 export function addTransaction(cat: Category, transaction: Transaction) {
     cat.transactions.push(transaction);
+    if (!cat.accounts[transaction.account]) {
+        cat.accounts[transaction.account] = 0;
+    }
+    cat.accounts[transaction.account] += transaction.amount;
     cat.amountInTransactions += transaction.amount;
 }
 
