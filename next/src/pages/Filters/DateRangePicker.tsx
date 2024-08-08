@@ -125,7 +125,7 @@ export interface DateRangePickerProps extends DateRange {
     value: DateRange;
 }
 
-const RANGE_TYPES = ["year", "month", "week"] as const;
+const RANGE_TYPES = ["year", "month"] as const;
 type RangeType = (typeof RANGE_TYPES)[number];
 
 export function DateRangePicker({

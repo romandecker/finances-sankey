@@ -1,5 +1,5 @@
 import { Checkbox } from "../../components/ui/checkbox";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -26,6 +26,9 @@ function FilterCheckbox({
         <div className="flex items-center space-x-2">
             <Checkbox
                 id={id}
+                onChange={(e) => {
+                    console.log("onChange", e);
+                }}
                 onCheckedChange={(checkedState) =>
                     onChange?.(checkedState === true, id)
                 }
@@ -73,19 +76,48 @@ export function Filters({
     filters,
     onFiltersChanged,
 }: FiltersProps) {
-    const onAccountCheckedChanged = (isChecked: boolean, account: string) =>
+    const onAccountCheckedChanged = (isChecked: boolean, account: string) => {
+        if (isCommandPressed) {
+            return onFiltersChanged?.({
+                ...filters,
+                accounts: [account],
+            });
+        }
         onFiltersChanged?.({
             ...filters,
             accounts: isChecked
                 ? [...(filters.accounts ?? []), account]
                 : (filters.accounts ?? []).filter((a) => a !== account),
         });
+    };
 
     const onDateRangeChanged = (dateRange: DateRange) =>
         onFiltersChanged?.({
             ...filters,
             dateRange,
         });
+
+    const [isCommandPressed, setIsCommandPressed] = useState(false);
+    useEffect(() => {
+        const keyDown = (e: KeyboardEvent) => {
+            if (e.key === "Meta" || e.key === "Control") {
+                setIsCommandPressed(true);
+            }
+        };
+        const keyUp = (e: KeyboardEvent) => {
+            if (e.key === "Meta" || e.key === "Control") {
+                setIsCommandPressed(false);
+            }
+        };
+
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
+
+        return () => {
+            document.removeEventListener("keydown", keyDown);
+            document.removeEventListener("keyup", keyUp);
+        };
+    }, []);
 
     return (
         <div className="flex flex-row gap-2 p-2">
