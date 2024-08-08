@@ -3,11 +3,11 @@
  * categories (with children) and it will build a map for quick access
  **/
 
-import { SankeyData } from "plotly.js";
-import { Filters, isIncludedByFilters } from "../../pages/Filters";
+import { Filters, isIncludedByFilters } from "../../pages/Filters/Filters";
 import { Transaction } from "../storage";
 import { addTransaction, calculateTotal, Category, getName } from "./Category";
 import { SankeyProps } from "../../pages/Sankey";
+import { min as minDate, max as maxDate } from "date-fns";
 
 interface Transfer {
     from: string;
@@ -41,7 +41,7 @@ export interface TransactionRegistry {
 export function makeTransactionRegistry(
     incomeTree: Category,
     expensesTree: Category,
-    filters: Filters = { type: "Income" }
+    filters: Filters = { type: "Expenses" }
 ) {
     const registry = {
         roots: {
@@ -202,4 +202,20 @@ export function createSankeyData(registry: TransactionRegistry): SankeyProps {
         link: { source, target, value },
         transactionCount: registry.ingestedTransactions.length,
     } satisfies SankeyProps;
+}
+
+export interface DateRange {
+    min: Date;
+    max: Date;
+}
+
+export function getDateRange(registry: TransactionRegistry): DateRange {
+    let min = new Date();
+    let max = new Date("1970-01-01");
+    for (const tx of registry.ingestedTransactions) {
+        min = minDate([min, tx.date]);
+        max = maxDate([max, tx.date]);
+    }
+
+    return { min, max };
 }

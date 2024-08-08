@@ -11,11 +11,12 @@ import { Sankey, SankeyProps } from "./Sankey";
 import {
     TransactionRegistry,
     getAccounts,
+    getDateRange,
     makeTransactionRegistry,
 } from "../utils/ingest/TransactionRegistry";
 import { createIncomeTree } from "../utils/ingest/income";
 import { createExpensesTree } from "../utils/ingest/expenses";
-import { Filters } from "./Filters";
+import { Filters } from "./Filters/Filters";
 import {
     FilterMessage,
     InitMessage,
@@ -33,7 +34,7 @@ interface WorkerContext {
 function useWorker() {
     const currentMessageIdRef = useRef(0);
     const lastMessageIdRef = useRef(0);
-    const [filters, setFilters] = useState<Filters>({});
+    const [filters, setFilters] = useState<Filters>();
     const [context, setWorkerContext] = useState<WorkerContext>({
         registry: makeTransactionRegistry(
             createIncomeTree(),
@@ -88,11 +89,11 @@ function useWorker() {
                     return;
                 }
 
-                console.log("got", event.data);
+                const registry = event.data.registry;
                 setWorkerContext(event.data);
                 setFilters((currentFilters) => {
-                    // make sure to only set filters when there are none
-                    if (currentFilters.accounts) {
+                    // if we already have filters, don't overwrite them
+                    if (currentFilters) {
                         return currentFilters;
                     }
 
@@ -100,7 +101,9 @@ function useWorker() {
                         accounts: getAccounts(
                             (event as MessageEvent<ResultMessage>).data.registry
                         ),
-                    };
+                        type: "Expenses",
+                        dateRange: getDateRange(registry),
+                    } satisfies Filters;
                 });
             }
         };
@@ -155,11 +158,14 @@ export default function Home() {
                     Browse...
                 </Button>
             </div>
-            <Filters
-                availableAccounts={getAccounts(registry)}
-                filters={filters}
-                onFiltersChanged={applyFilters}
-            />
+            {filters && (
+                <Filters
+                    availableAccounts={getAccounts(registry)}
+                    availableDateRange={getDateRange(registry)}
+                    filters={filters}
+                    onFiltersChanged={applyFilters}
+                />
+            )}
             {isLoading || !sankeyData ? (
                 <span>Loading...</span>
             ) : (

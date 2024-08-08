@@ -1,13 +1,16 @@
-import { Checkbox } from "../components/ui/checkbox";
+import { Checkbox } from "../../components/ui/checkbox";
 import { PropsWithChildren } from "react";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
-} from "../components/ui/card";
-import { Transaction } from "../utils/storage";
-import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
+} from "../../components/ui/card";
+import { Transaction } from "../../utils/storage";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
+import { DateRangePicker } from "./DateRangePicker";
+import { DateRange } from "../../utils/ingest/TransactionRegistry";
+import { isWithinInterval } from "date-fns";
 
 function FilterCheckbox({
     id,
@@ -40,25 +43,33 @@ function FilterCheckbox({
 
 export interface FiltersProps {
     availableAccounts: string[];
+    availableDateRange: { min: Date; max: Date };
 
     filters: Filters;
     onFiltersChanged?: (newFilters: Filters) => void;
 }
 
 export interface Filters {
-    accounts?: string[];
+    accounts: string[];
+    dateRange: { min: Date; max: Date };
     type: Transaction["type"];
 }
 
 export function isIncludedByFilters(filters: Filters, tx: Transaction) {
     return (
         filters.type === tx.type &&
-        (!filters.accounts || filters.accounts.includes(tx.account))
+        (!filters.accounts || filters.accounts.includes(tx.account)) &&
+        (!filters.dateRange ||
+            isWithinInterval(tx.date, {
+                start: filters.dateRange.min,
+                end: filters.dateRange.max,
+            }))
     );
 }
 
 export function Filters({
     availableAccounts,
+    availableDateRange,
     filters,
     onFiltersChanged,
 }: FiltersProps) {
@@ -70,7 +81,11 @@ export function Filters({
                 : (filters.accounts ?? []).filter((a) => a !== account),
         });
 
-    const onTypeChanged = () => {};
+    const onDateRangeChanged = (dateRange: DateRange) =>
+        onFiltersChanged?.({
+            ...filters,
+            dateRange,
+        });
 
     return (
         <div className="flex flex-row gap-2 p-2">
@@ -99,25 +114,35 @@ export function Filters({
                 <CardHeader>
                     <RadioGroup
                         defaultValue="Expenses"
-                        onChange={(e) => console.log("#####", e)}
+                        onValueChange={(type: Transaction["type"]) =>
+                            onFiltersChanged?.({
+                                ...filters,
+                                type,
+                            })
+                        }
                     >
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem
-                                onChange={(e) => console.log("#####", e)}
                                 value="Expenses"
                                 id="radio-Expenses"
                             />
                             <label htmlFor="radio-Expenses">Expenses</label>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem
-                                value="Income"
-                                id="radio-Income"
-                                onChange={(e) => console.log("#####", e)}
-                            />
+                            <RadioGroupItem value="Income" id="radio-Income" />
                             <label htmlFor="radio-Income">Income</label>
                         </div>
                     </RadioGroup>
+                </CardHeader>
+            </Card>
+            <Card>
+                <CardHeader className="p-2">
+                    <CardDescription>Time range</CardDescription>
+                    <DateRangePicker
+                        {...availableDateRange}
+                        value={filters.dateRange}
+                        onChange={onDateRangeChanged}
+                    />
                 </CardHeader>
             </Card>
         </div>

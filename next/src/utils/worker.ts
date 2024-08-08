@@ -1,4 +1,4 @@
-import { Filters } from "../pages/Filters";
+import { Filters } from "../pages/Filters/Filters";
 import { SankeyProps } from "../pages/Sankey";
 import {
     TransactionRegistry,
