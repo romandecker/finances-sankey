@@ -9,6 +9,7 @@ import {
     SelectValue,
 } from "../../components/ui/select";
 import {
+    addMonths,
     eachMonthOfInterval,
     eachYearOfInterval,
     endOfMonth,
@@ -20,6 +21,8 @@ import {
     startOfYear,
 } from "date-fns";
 import { DateRange } from "../../utils/ingest/TransactionRegistry";
+import { Button } from "../../components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface YearPickerProps extends DateRange {
     onChange?: (value: number) => void;
@@ -33,7 +36,7 @@ function YearPicker({ min, max, onChange, value }: YearPickerProps) {
             value={value.toString()}
             onValueChange={(year) => onChange?.(+year)}
         >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger>
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -61,10 +64,39 @@ function MonthPicker({ min, max, onChange, value }: MonthPickerProps) {
         end: endOfYear(value.min),
     });
 
-    console.log("value", value);
-
     return (
-        <>
+        <div className="flex gap-1">
+            <Button
+                onClick={() => {
+                    const min = startOfMonth(addMonths(value.min, -1));
+                    onChange?.({ min: min, max: endOfMonth(min) });
+                }}
+            >
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Select
+                value={startOfMonth(value.min).toISOString()}
+                onValueChange={(value) =>
+                    onChange?.({
+                        min: startOfMonth(value),
+                        max: endOfMonth(value),
+                    })
+                }
+            >
+                <SelectTrigger>
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    {months.map((month) => (
+                        <SelectItem
+                            key={month.toISOString()}
+                            value={month.toISOString()}
+                        >
+                            {format(month, "MMMM")}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
             <YearPicker
                 min={min}
                 max={max}
@@ -76,30 +108,15 @@ function MonthPicker({ min, max, onChange, value }: MonthPickerProps) {
                     });
                 }}
             />
-            <Select
-                value={startOfMonth(value.min).toISOString()}
-                onValueChange={(value) =>
-                    onChange?.({
-                        min: startOfMonth(value),
-                        max: endOfMonth(value),
-                    })
-                }
+            <Button
+                onClick={() => {
+                    const min = startOfMonth(addMonths(value.min, 1));
+                    onChange?.({ min: min, max: endOfMonth(min) });
+                }}
             >
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    {months.map((month) => (
-                        <SelectItem
-                            key={month.toISOString()}
-                            value={month.toISOString()}
-                        >
-                            {format(month, "MMM y")}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-        </>
+                <ChevronRight className="h-4 w-4" />
+            </Button>
+        </div>
     );
 }
 
