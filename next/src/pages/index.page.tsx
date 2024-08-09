@@ -23,6 +23,8 @@ import {
     Message,
     ResultMessage,
 } from "../utils/worker";
+import { FolderOpenDotIcon } from "lucide-react";
+import { Sidebar } from "./Sidebar/Sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -146,35 +148,41 @@ export default function Home() {
     } = useWorker();
 
     return (
-        <>
-            <div>
-                <Button
-                    onClick={async () => {
-                        const transactions = await importCsv();
-                        setTransactions(transactions);
-                        saveLocalStorage(transactions);
-                    }}
-                >
-                    Browse...
-                </Button>
+        <div className="flex flex-row">
+            <Sidebar>
+                {filters && (
+                    <Filters
+                        availableAccounts={getAccounts(registry)}
+                        availableDateRange={getDateRange(registry)}
+                        availableCategories={{
+                            Income: registry.roots.Income.root,
+                            Expenses: registry.roots.Expenses.root,
+                        }}
+                        filters={filters}
+                        onFiltersChanged={applyFilters}
+                    />
+                )}
+            </Sidebar>
+            <div className="flex flex-col flex-grow">
+                <div className="flex items-center justify-between p-4">
+                    <h1 className="text-2xl">Your finances sankey</h1>
+                    <Button
+                        onClick={async () => {
+                            const transactions = await importCsv();
+                            setTransactions(transactions);
+                            saveLocalStorage(transactions);
+                        }}
+                    >
+                        <FolderOpenDotIcon />
+                        &nbsp;Browse
+                    </Button>
+                </div>
+                {isLoading || !sankeyData ? (
+                    <span>Loading...</span>
+                ) : (
+                    <Sankey {...sankeyData} />
+                )}
             </div>
-            {filters && (
-                <Filters
-                    availableAccounts={getAccounts(registry)}
-                    availableDateRange={getDateRange(registry)}
-                    availableCategories={{
-                        Income: registry.roots.Income.root,
-                        Expenses: registry.roots.Expenses.root,
-                    }}
-                    filters={filters}
-                    onFiltersChanged={applyFilters}
-                />
-            )}
-            {isLoading || !sankeyData ? (
-                <span>Loading...</span>
-            ) : (
-                <Sankey {...sankeyData} />
-            )}
-        </>
+        </div>
     );
 }

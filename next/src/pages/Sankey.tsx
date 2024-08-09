@@ -16,15 +16,20 @@ export function Sankey({ label, link, transactionCount }: SankeyProps) {
     useEffect(() => {
         setIsClient(true);
     }, []);
-    const { ref, width = 100 } = useResizeObserver<HTMLDivElement>();
-    const height = 1000;
+    const {
+        ref,
+        width = 100,
+        height = 100,
+    } = useResizeObserver<HTMLDivElement>();
+    // const height = 300;
+    // console.log(height);
 
     if (!isClient) {
         return null;
     }
 
     return (
-        <div className="w-full" ref={ref}>
+        <div className="flex-1 overflow-hidden" ref={ref}>
             <Plot
                 data={[
                     {
@@ -45,7 +50,7 @@ export function Sankey({ label, link, transactionCount }: SankeyProps) {
                 ]}
                 layout={{
                     width,
-                    height,
+                    height: height - 10,
                     title: `${transactionCount} transactions`,
                 }}
             />

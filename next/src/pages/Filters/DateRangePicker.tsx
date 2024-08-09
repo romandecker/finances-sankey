@@ -65,38 +65,7 @@ function MonthPicker({ min, max, onChange, value }: MonthPickerProps) {
     });
 
     return (
-        <div className="flex gap-1">
-            <Button
-                onClick={() => {
-                    const min = startOfMonth(addMonths(value.min, -1));
-                    onChange?.({ min: min, max: endOfMonth(min) });
-                }}
-            >
-                <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Select
-                value={startOfMonth(value.min).toISOString()}
-                onValueChange={(value) =>
-                    onChange?.({
-                        min: startOfMonth(value),
-                        max: endOfMonth(value),
-                    })
-                }
-            >
-                <SelectTrigger>
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    {months.map((month) => (
-                        <SelectItem
-                            key={month.toISOString()}
-                            value={month.toISOString()}
-                        >
-                            {format(month, "MMMM")}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+        <div className="flex flex-col gap-1">
             <YearPicker
                 min={min}
                 max={max}
@@ -108,14 +77,47 @@ function MonthPicker({ min, max, onChange, value }: MonthPickerProps) {
                     });
                 }}
             />
-            <Button
-                onClick={() => {
-                    const min = startOfMonth(addMonths(value.min, 1));
-                    onChange?.({ min: min, max: endOfMonth(min) });
-                }}
-            >
-                <ChevronRight className="h-4 w-4" />
-            </Button>
+            <div className="flex flex-row gap-1">
+                <Button
+                    onClick={() => {
+                        const min = startOfMonth(addMonths(value.min, -1));
+                        onChange?.({ min: min, max: endOfMonth(min) });
+                    }}
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Select
+                    value={startOfMonth(value.min).toISOString()}
+                    onValueChange={(value) =>
+                        onChange?.({
+                            min: startOfMonth(value),
+                            max: endOfMonth(value),
+                        })
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {months.map((month) => (
+                            <SelectItem
+                                key={month.toISOString()}
+                                value={month.toISOString()}
+                            >
+                                {format(month, "MMMM")}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Button
+                    onClick={() => {
+                        const min = startOfMonth(addMonths(value.min, 1));
+                        onChange?.({ min: min, max: endOfMonth(min) });
+                    }}
+                >
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
+            </div>
         </div>
     );
 }
@@ -136,7 +138,7 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
     const [rangeType, setRangeType] = React.useState<RangeType>("year");
     return (
-        <>
+        <div className="flex flex-col gap-1">
             <Select
                 value={rangeType}
                 onValueChange={(val) => setRangeType(val as RangeType)}
@@ -174,6 +176,6 @@ export function DateRangePicker({
                     value={value}
                 />
             )}
-        </>
+        </div>
     );
 }

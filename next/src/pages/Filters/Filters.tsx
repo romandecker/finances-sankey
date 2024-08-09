@@ -124,7 +124,7 @@ export function Filters({
     }, []);
 
     return (
-        <div className="flex flex-row gap-2 p-2">
+        <>
             <Card>
                 <CardHeader className="p-2">
                     <CardDescription>Accounts</CardDescription>
@@ -191,6 +191,6 @@ export function Filters({
                     <CategoryFilter root={availableCategories[filters.type]} />
                 </CardContent>
             </Card>
-        </div>
+        </>
     );
 }
