@@ -162,6 +162,10 @@ export default function Home() {
                 <Filters
                     availableAccounts={getAccounts(registry)}
                     availableDateRange={getDateRange(registry)}
+                    availableCategories={{
+                        Income: registry.roots.Income.root,
+                        Expenses: registry.roots.Expenses.root,
+                    }}
                     filters={filters}
                     onFiltersChanged={applyFilters}
                 />

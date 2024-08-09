@@ -11,6 +11,8 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { DateRangePicker } from "./DateRangePicker";
 import { DateRange } from "../../utils/ingest/TransactionRegistry";
 import { isWithinInterval } from "date-fns";
+import { CategoryFilter } from "./CategoryFilter";
+import { Category } from "../../utils/ingest/Category";
 
 function FilterCheckbox({
     id,
@@ -47,6 +49,7 @@ function FilterCheckbox({
 export interface FiltersProps {
     availableAccounts: string[];
     availableDateRange: { min: Date; max: Date };
+    availableCategories: { Income: Category; Expenses: Category };
 
     filters: Filters;
     onFiltersChanged?: (newFilters: Filters) => void;
@@ -73,6 +76,7 @@ export function isIncludedByFilters(filters: Filters, tx: Transaction) {
 export function Filters({
     availableAccounts,
     availableDateRange,
+    availableCategories,
     filters,
     onFiltersChanged,
 }: FiltersProps) {
@@ -143,7 +147,7 @@ export function Filters({
                 <CardHeader className="p-2">
                     <CardDescription>Type</CardDescription>
                 </CardHeader>
-                <CardHeader>
+                <CardContent>
                     <RadioGroup
                         defaultValue="Expenses"
                         onValueChange={(type: Transaction["type"]) =>
@@ -165,17 +169,27 @@ export function Filters({
                             <label htmlFor="radio-Income">Income</label>
                         </div>
                     </RadioGroup>
-                </CardHeader>
+                </CardContent>
             </Card>
             <Card>
                 <CardHeader className="p-2">
                     <CardDescription>Time range</CardDescription>
+                </CardHeader>
+                <CardContent>
                     <DateRangePicker
                         {...availableDateRange}
                         value={filters.dateRange}
                         onChange={onDateRangeChanged}
                     />
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="p-2">
+                    <CardDescription>Categories</CardDescription>
                 </CardHeader>
+                <CardContent>
+                    <CategoryFilter root={availableCategories[filters.type]} />
+                </CardContent>
             </Card>
         </div>
     );
