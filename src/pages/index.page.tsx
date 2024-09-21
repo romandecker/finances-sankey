@@ -10,7 +10,7 @@ import {
     getDateRange,
     makeTransactionRegistry,
 } from "../utils/ingest/TransactionRegistry";
-import { defaultOntology } from "../utils/ingest/parseCategories";
+import { makeDefaultOntology } from "../utils/ingest/parseCategories";
 import {
     Transaction,
     importCsv,
@@ -39,7 +39,7 @@ function useWorker() {
     const lastMessageIdRef = useRef(0);
     const [filters, setFilters] = useState<Filters>();
     const [context, setWorkerContext] = useState<WorkerContext>({
-        registry: makeTransactionRegistry(defaultOntology),
+        registry: makeTransactionRegistry(makeDefaultOntology()),
     });
     const workerRef = useRef<Worker>();
 

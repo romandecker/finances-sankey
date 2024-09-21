@@ -39,4 +39,5 @@ export const ontologySchema = z.object({
 });
 
 export type CategoryOntology = z.infer<typeof ontologySchema>;
-export const defaultOntology = ontologySchema.parse(defaultCategories);
+export const makeDefaultOntology = () =>
+    ontologySchema.parse(defaultCategories);
