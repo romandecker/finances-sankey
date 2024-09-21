@@ -64,3 +64,13 @@ export function calculateTotal(root: Category): number {
         root.amountInTransactions
     );
 }
+
+export function collect(category: Category) {
+    const categories = [category];
+
+    for (const child of category.children) {
+        categories.push(...collect(child));
+    }
+
+    return categories;
+}

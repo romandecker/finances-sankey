@@ -8,11 +8,11 @@ import {
 } from "../../components/ui/card";
 import { Transaction } from "../../utils/storage";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
-import { DateRangePicker } from "./DateRangePicker";
+import { DateRangePicker } from "./DateRangePicker/DateRangePicker";
 import { DateRange } from "../../utils/ingest/TransactionRegistry";
 import { isWithinInterval } from "date-fns";
 import { CategoryFilter } from "./CategoryFilter";
-import { Category } from "../../utils/ingest/Category";
+import { Category, getName } from "../../utils/ingest/Category";
 
 function FilterCheckbox({
     id,
@@ -59,17 +59,22 @@ export interface Filters {
     accounts: string[];
     dateRange: { min: Date; max: Date };
     type: Transaction["type"];
+    categories: string[];
 }
 
-export function isIncludedByFilters(filters: Filters, tx: Transaction) {
+export function isIncludedByFilters(
+    filters: Filters,
+    tx: Omit<Transaction, "category"> & { category?: Category }
+) {
     return (
         filters.type === tx.type &&
-        (!filters.accounts || filters.accounts.includes(tx.account)) &&
-        (!filters.dateRange ||
-            isWithinInterval(tx.date, {
-                start: filters.dateRange.min,
-                end: filters.dateRange.max,
-            }))
+        filters.accounts.includes(tx.account) &&
+        isWithinInterval(tx.date, {
+            start: filters.dateRange.min,
+            end: filters.dateRange.max,
+        }) &&
+        tx.category &&
+        filters.categories.includes(getName(tx.category))
     );
 }
 
@@ -90,8 +95,8 @@ export function Filters({
         onFiltersChanged?.({
             ...filters,
             accounts: isChecked
-                ? [...(filters.accounts ?? []), account]
-                : (filters.accounts ?? []).filter((a) => a !== account),
+                ? [...filters.accounts, account]
+                : filters.accounts.filter((a) => a !== account),
         });
     };
 
@@ -100,6 +105,25 @@ export function Filters({
             ...filters,
             dateRange,
         });
+
+    const onCategoryFilterChanged = (
+        isChecked: boolean,
+        categories: string[]
+    ) => {
+        if (isCommandPressed && isChecked) {
+            return onFiltersChanged?.({
+                ...filters,
+                categories,
+            });
+        }
+
+        onFiltersChanged?.({
+            ...filters,
+            categories: isChecked
+                ? [...filters.categories, ...categories]
+                : filters.categories.filter((c) => !categories.includes(c)),
+        });
+    };
 
     const [isCommandPressed, setIsCommandPressed] = useState(false);
     useEffect(() => {
@@ -125,24 +149,6 @@ export function Filters({
 
     return (
         <>
-            <Card>
-                <CardHeader className="p-2">
-                    <CardDescription>Accounts</CardDescription>
-                </CardHeader>
-
-                <CardContent className="flex flex-col gap-1 p-2">
-                    {availableAccounts.map((account) => (
-                        <FilterCheckbox
-                            id={account}
-                            key={account}
-                            onChange={onAccountCheckedChanged}
-                            isChecked={filters.accounts?.includes(account)}
-                        >
-                            {account}
-                        </FilterCheckbox>
-                    ))}
-                </CardContent>
-            </Card>
             <Card>
                 <CardHeader className="p-2">
                     <CardDescription>Type</CardDescription>
@@ -185,10 +191,32 @@ export function Filters({
             </Card>
             <Card>
                 <CardHeader className="p-2">
+                    <CardDescription>Accounts</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-1 p-2">
+                    {availableAccounts.map((account) => (
+                        <FilterCheckbox
+                            id={account}
+                            key={account}
+                            onChange={onAccountCheckedChanged}
+                            isChecked={filters.accounts?.includes(account)}
+                        >
+                            {account}
+                        </FilterCheckbox>
+                    ))}
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="p-2">
                     <CardDescription>Categories</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <CategoryFilter root={availableCategories[filters.type]} />
+                    <CategoryFilter
+                        isRoot
+                        category={availableCategories[filters.type]}
+                        onChange={onCategoryFilterChanged}
+                        activeCategories={filters.categories}
+                    />
                 </CardContent>
             </Card>
         </>

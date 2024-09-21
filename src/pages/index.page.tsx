@@ -1,30 +1,32 @@
+import { Button } from "@/components/ui/button";
+import { FolderOpenDotIcon } from "lucide-react";
 import { Inter } from "next/font/google";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+    TransactionRegistry,
+    getAccounts,
+    getCategoryNames,
+    getDateRange,
+    makeTransactionRegistry,
+} from "../utils/ingest/TransactionRegistry";
+import { createExpensesTree } from "../utils/ingest/expenses";
+import { createIncomeTree } from "../utils/ingest/income";
 import {
     Transaction,
     importCsv,
     loadLocalStorage,
     saveLocalStorage,
 } from "../utils/storage";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Sankey, SankeyProps } from "./Sankey";
-import {
-    TransactionRegistry,
-    getAccounts,
-    getDateRange,
-    makeTransactionRegistry,
-} from "../utils/ingest/TransactionRegistry";
-import { createIncomeTree } from "../utils/ingest/income";
-import { createExpensesTree } from "../utils/ingest/expenses";
-import { Filters } from "./Filters/Filters";
 import {
     FilterMessage,
     InitMessage,
     Message,
     ResultMessage,
 } from "../utils/worker";
-import { FolderOpenDotIcon } from "lucide-react";
+import { Filters } from "./Filters/Filters";
+import { Sankey, SankeyProps } from "./Sankey";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { endOfYear, startOfYear } from "date-fns";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -93,6 +95,7 @@ function useWorker() {
 
                 const registry = event.data.registry;
                 setWorkerContext(event.data);
+                const maxRange = getDateRange(registry);
                 setFilters((currentFilters) => {
                     // if we already have filters, don't overwrite them
                     if (currentFilters) {
@@ -104,7 +107,11 @@ function useWorker() {
                             (event as MessageEvent<ResultMessage>).data.registry
                         ),
                         type: "Expenses",
-                        dateRange: getDateRange(registry),
+                        dateRange: {
+                            min: startOfYear(maxRange.max),
+                            max: endOfYear(maxRange.max),
+                        },
+                        categories: getCategoryNames(registry),
                     } satisfies Filters;
                 });
             }
@@ -148,7 +155,7 @@ export default function Home() {
     } = useWorker();
 
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row min-h-screen">
             <Sidebar>
                 {filters && (
                     <Filters

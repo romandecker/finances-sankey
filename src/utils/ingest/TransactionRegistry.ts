@@ -8,6 +8,7 @@ import { Transaction } from "../storage";
 import { addTransaction, calculateTotal, Category, getName } from "./Category";
 import { SankeyProps } from "../../pages/Sankey";
 import { min as minDate, max as maxDate } from "date-fns";
+import { pickColor } from "./colors";
 
 interface Transfer {
     from: string;
@@ -35,13 +36,13 @@ export interface TransactionRegistry {
     accounts: Set<string>;
     accountTransfers: Transfer[];
     ingestedTransactions: Transaction[];
-    filters: Filters;
+    filters?: Filters;
 }
 
 export function makeTransactionRegistry(
     incomeTree: Category,
     expensesTree: Category,
-    filters: Filters = { type: "Expenses" }
+    filters?: Filters
 ) {
     const registry = {
         roots: {
@@ -135,7 +136,15 @@ export function ingest(
         registry.ingestedTransactions.push(tx);
         registry.accounts.add(tx.account);
 
-        if (!isIncludedByFilters(registry.filters, tx)) {
+        const cat = getCategory(registry, tx.category, tx.type);
+
+        if (
+            registry.filters &&
+            !isIncludedByFilters(registry.filters, {
+                ...tx,
+                category: cat,
+            })
+        ) {
             // console.log("skipped", tx);
             continue;
         }
@@ -144,8 +153,6 @@ export function ingest(
             ingestTransfer(registry, openTransfers, tx);
             continue;
         }
-
-        const cat = getCategory(registry, tx.category, tx.type);
 
         if (!cat) {
             console.warn(
@@ -157,8 +164,13 @@ export function ingest(
         addTransaction(cat, tx);
     }
 
-    if (!registry.filters.accounts) {
-        registry.filters.accounts = getAccounts(registry);
+    if (!registry.filters) {
+        registry.filters = {
+            accounts: getAccounts(registry),
+            dateRange: getDateRange(registry),
+            type: "Expenses",
+            categories: getCategoryNames(registry),
+        };
     }
 
     if (openTransfers.length) {
@@ -172,7 +184,9 @@ export function ingest(
 export function createSankeyData(registry: TransactionRegistry): SankeyProps {
     const categories = [
         ...new Set(
-            Object.values(registry.roots[registry.filters.type].categories)
+            Object.values(
+                registry.roots[registry.filters?.type ?? "Expenses"].categories
+            )
         ),
     ];
     const accounts = getAccounts(registry);
@@ -185,7 +199,7 @@ export function createSankeyData(registry: TransactionRegistry): SankeyProps {
         const category = categories[i];
         for (const child of category.children) {
             const childIndex = labels.indexOf(getName(child));
-            if (registry.filters.type === "Income") {
+            if (registry.filters?.type === "Income") {
                 source.push(childIndex);
                 value.push(calculateTotal(child));
                 target.push(i);
@@ -199,6 +213,7 @@ export function createSankeyData(registry: TransactionRegistry): SankeyProps {
 
     return {
         label: labels,
+        color: labels.map(pickColor),
         link: { source, target, value },
         transactionCount: registry.ingestedTransactions.length,
     } satisfies SankeyProps;
@@ -218,4 +233,11 @@ export function getDateRange(registry: TransactionRegistry): DateRange {
     }
 
     return { min, max };
+}
+
+export function getCategoryNames(registry: TransactionRegistry) {
+    const type = registry.filters?.type || "Expenses";
+    const categories = Object.values(registry.roots[type].categories);
+
+    return [...new Set(categories.map(getName))];
 }
