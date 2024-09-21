@@ -1,0 +1,196 @@
+{
+    "expenses": [
+        {
+            "names": ["Food & Beverages", "Food & Drinks"],
+            "children": [
+                { "names": ["Bar, Cafe", "Bar, cafe"] },
+                {
+                    "names": ["Groceries"],
+                    "children": [{ "names": ["Meal Kits"] }]
+                },
+                {
+                    "names": ["Restaurant, fast-food"],
+                    "children": [
+                        { "names": ["Deli"] },
+                        { "names": ["Food delivery"] }
+                    ]
+                }
+            ]
+        },
+        {
+            "names": ["Shopping"],
+            "children": [
+                { "names": ["Clothes & Footwear", "Clothes & shoes"] },
+                { "names": ["Drug-store, chemist"] },
+                { "names": ["Electronics, accessories"] },
+                { "names": ["Gifts, joy", "Gifts"] },
+                { "names": ["Health and beauty"] },
+                { "names": ["Home, garden"] },
+                { "names": ["Jewels, accessories"] },
+                { "names": ["Kids"] },
+                { "names": ["Leisure time"] },
+                { "names": ["Pets, animals"] },
+                { "names": ["Stationery, tools"] }
+            ]
+        },
+        {
+            "names": ["Housing"],
+            "children": [
+                {
+                    "names": ["Energy, utilities"],
+                    "children": [
+                        { "names": ["Electricity"] },
+                        { "names": ["Heating"] }
+                    ]
+                },
+                { "names": ["Maintenance, repairs"] },
+                { "names": ["Mortgage"] },
+                { "names": ["Property insurance"] },
+                { "names": ["Rent"] },
+                { "names": ["Services"] }
+            ]
+        },
+        {
+            "names": ["Transportation"],
+            "children": [
+                { "names": ["Business trips"] },
+                { "names": ["Long distance"] },
+                {
+                    "names": ["Public transport"],
+                    "children": [{ "names": ["Train"] }]
+                },
+                { "names": ["Taxi"] }
+            ]
+        },
+        {
+            "names": ["Vehicle"],
+            "children": [
+                { "names": ["Fuel"] },
+                { "names": ["Leasing"] },
+                { "names": ["Parking"] },
+                { "names": ["Rentals"] },
+                { "names": ["Vehicle insurance"] },
+                { "names": ["Vehicle maintenance"] }
+            ]
+        },
+        {
+            "names": ["Life & Entertainment"],
+            "children": [
+                { "names": ["Active sport, fitness"] },
+                { "names": ["Alcohol, tobacco"] },
+                { "names": ["Books, audio, subscriptions"] },
+                {
+                    "names": ["Charity, gifts"],
+                    "children": [{ "names": ["Donations"] }]
+                },
+                { "names": ["Culture, sport events"] },
+                { "names": ["Education, development"] },
+                {
+                    "names": ["Health care, doctor"],
+                    "children": [
+                        { "names": ["Medical treatment, therapy"] },
+                        { "names": ["Medicine"] }
+                    ]
+                },
+                { "names": ["Hobbies", "Free time"] },
+                { "names": ["Holiday, trips, hotels"] },
+                { "names": ["Life events"] },
+                { "names": ["Lottery, gambling"] },
+                { "names": ["TV, Streaming"] },
+                { "names": ["Wellness, beauty"] }
+            ]
+        },
+        {
+            "names": ["Communication, PC"],
+            "children": [
+                { "names": ["Internet"] },
+                { "names": ["Postal services"] },
+                {
+                    "names": ["Software, apps, games"],
+                    "children": [{ "names": ["Gaming"] }]
+                },
+                {
+                    "names": ["Telephony, mobile phone", "Phone, cell phone"]
+                }
+            ]
+        },
+        {
+            "names": ["Financial expenses"],
+            "children": [
+                { "names": ["Advisory"] },
+                { "names": ["Charges, Fees"] },
+                { "names": ["Child Support"] },
+                { "names": ["Fines"] },
+                { "names": ["Insurances"] },
+                { "names": ["Loans, interests", "Loan, interests"] },
+                {
+                    "names": ["Taxes"],
+                    "children": [
+                        { "names": ["DDI (Ausschüttungsgleicher Ertrag)"] }
+                    ]
+                }
+            ]
+        },
+        {
+            "names": ["Investments"],
+            "children": [
+                { "names": ["Collections"] },
+                {
+                    "names": ["Financial investments"],
+                    "children": [{ "names": ["Crypto"] }]
+                },
+                { "names": ["Realty"] },
+                { "names": ["Savings"] },
+                { "names": ["Vehicles, chattels"] }
+            ]
+        },
+        {
+            "names": ["Others"],
+            "children": [
+                {
+                    "names": ["Missing"],
+                    "children": [
+                        { "names": ["Lent out money"] },
+                        {
+                            "names": [
+                                "Money returned to owner",
+                                "Returned lent out money"
+                            ]
+                        },
+                        { "names": ["Unknown Expense", "UNKNOWN_CATEGORY"] }
+                    ]
+                }
+            ]
+        }
+    ],
+    "income": [
+        { "names": ["Checks, coupons"] },
+        { "names": ["Child Support"] },
+        { "names": ["Dues & grants"] },
+        { "names": ["Gifts", "Gifts, joy"] },
+        { "names": ["Interests, dividends"] },
+        {
+            "names": ["Lending, renting"],
+            "children": [
+                {
+                    "names": ["Money returned to me", "Returned lent out money"]
+                },
+                { "names": ["Splitwise credit"] },
+                {
+                    "names": [
+                        "Temporarily held money intended for another purpose"
+                    ]
+                }
+            ]
+        },
+        { "names": ["Lottery, gambling"] },
+        { "names": ["Refunds (tax, purchase)"] },
+        { "names": ["Rental income"] },
+        {
+            "names": ["Sale"],
+            "children": [{ "names": ["Sale of securities"] }]
+        },
+        { "names": ["Wage, invoices"] },
+        { "names": ["Missing", "UNKNOWN_CATEGORY"] }
+    ]
+}

@@ -6,8 +6,7 @@ import {
     ingest,
     makeTransactionRegistry,
 } from "./ingest/TransactionRegistry";
-import { createExpensesTree } from "./ingest/expenses";
-import { createIncomeTree } from "./ingest/income";
+import { defaultOntology } from "./ingest/parseCategories";
 import { Transaction } from "./storage";
 
 export type InitMessage = {
@@ -36,10 +35,7 @@ let registry: TransactionRegistry;
 
 addEventListener("message", (event: MessageEvent<Message>) => {
     if (event.data.type === "INIT") {
-        registry = makeTransactionRegistry(
-            createIncomeTree(),
-            createExpensesTree()
-        );
+        registry = makeTransactionRegistry(defaultOntology);
 
         transactions = event.data.transactions;
         ingest(registry, event.data.transactions);
@@ -50,11 +46,7 @@ addEventListener("message", (event: MessageEvent<Message>) => {
             id: event.data.id,
         } satisfies ResultMessage);
     } else if (event.data.type === "FILTER") {
-        registry = makeTransactionRegistry(
-            createIncomeTree(),
-            createExpensesTree(),
-            event.data.filters
-        );
+        registry = makeTransactionRegistry(defaultOntology, event.data.filters);
 
         ingest(registry, transactions);
         postMessage({

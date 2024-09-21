@@ -9,6 +9,7 @@ import { addTransaction, calculateTotal, Category, getName } from "./Category";
 import { SankeyProps } from "../../pages/Sankey";
 import { min as minDate, max as maxDate } from "date-fns";
 import { pickColor } from "./colors";
+import { CategoryOntology } from "./parseCategories";
 
 interface Transfer {
     from: string;
@@ -40,18 +41,17 @@ export interface TransactionRegistry {
 }
 
 export function makeTransactionRegistry(
-    incomeTree: Category,
-    expensesTree: Category,
+    ontology: CategoryOntology,
     filters?: Filters
 ) {
     const registry = {
         roots: {
             Income: {
-                root: incomeTree,
+                root: ontology.income,
                 categories: {},
             },
             Expenses: {
-                root: expensesTree,
+                root: ontology.expenses,
                 categories: {},
             },
         },
@@ -61,8 +61,8 @@ export function makeTransactionRegistry(
         filters,
     };
 
-    register(registry, incomeTree);
-    register(registry, expensesTree);
+    register(registry, ontology.income);
+    register(registry, ontology.expenses);
 
     return registry;
 }

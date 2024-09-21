@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { endOfYear, startOfYear } from "date-fns";
 import { FolderOpenDotIcon } from "lucide-react";
 import { Inter } from "next/font/google";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -9,8 +10,7 @@ import {
     getDateRange,
     makeTransactionRegistry,
 } from "../utils/ingest/TransactionRegistry";
-import { createExpensesTree } from "../utils/ingest/expenses";
-import { createIncomeTree } from "../utils/ingest/income";
+import { defaultOntology } from "../utils/ingest/parseCategories";
 import {
     Transaction,
     importCsv,
@@ -26,7 +26,6 @@ import {
 import { Filters } from "./Filters/Filters";
 import { Sankey, SankeyProps } from "./Sankey";
 import { Sidebar } from "./Sidebar/Sidebar";
-import { endOfYear, startOfYear } from "date-fns";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,10 +39,7 @@ function useWorker() {
     const lastMessageIdRef = useRef(0);
     const [filters, setFilters] = useState<Filters>();
     const [context, setWorkerContext] = useState<WorkerContext>({
-        registry: makeTransactionRegistry(
-            createIncomeTree(),
-            createExpensesTree()
-        ),
+        registry: makeTransactionRegistry(defaultOntology),
     });
     const workerRef = useRef<Worker>();
 
